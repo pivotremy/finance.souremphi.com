@@ -1,0 +1,50 @@
+name: prisma-prisma
+services:
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    command: ['postgres', '-c', 'log_statement=all']
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=prisma
+      - POSTGRES_PASSWORD=prisma
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+  mysql:
+    image: mysql:8.0
+    command: --lower_case_table_names=1
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=tests
+      - MYSQL_USER=prisma # not used
+      - MYSQL_PASSWORD=prisma
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P3306']
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+  mariadb:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=tests
+      - MYSQL_USER=prisma # not used
+      - MYSQL_PASSWORD=prisma
+    ports:
+      - '4306:3306'
+    healthcheck:
+      test: ['CMD', '/usr/local/bin/healthcheck.sh', '--connect']
+      interval: 5s
+      timeout: 2s
+      retries: 20
